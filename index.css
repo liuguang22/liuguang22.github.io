@@ -1,0 +1,210 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background-color: #f5f5dc;
+  font-family: Arial, sans-serif;
+  touch-action: manipulation;
+}
+
+.main-container {
+  width: 100%;
+  max-width: 400px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.chess-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.chess-board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9/10;
+  max-height: 55vh; /* 限制棋盘高度 */
+  background-color: #e8c887;
+  border: 2px solid #8b4513;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  padding: 5% 5.5%;
+}
+
+/* 横线 */
+.horizontal-line {
+  position: absolute;
+  width: 89%; /* 100% - 5.5%*2 */
+  height: 1px;
+  background-color: #000;
+  left: 5.5%;
+  top: calc(5% + var(--line-index) * 10%);
+}
+
+/* 竖线 */
+.vertical-line {
+  position: absolute;
+  width: 1px;
+  height: 90%; /* 100% - 5%*2 */
+  background-color: #000;
+  top: 5%;
+  left: calc(5.5% + var(--line-index) * 11.125%);
+}
+
+/* 添加楷体字体 */
+@font-face {
+  font-family: "STKaiti";
+  src: local("STKaiti"), local("KaiTi");
+}
+
+/* 棋子基础样式 */
+.chess-piece {
+  position: absolute;
+  width: 9%;
+  height: 9%;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8em;
+  font-weight: bold;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  user-select: none;
+  font-family: "STKaiti", "楷体", serif;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), inset 0 -2px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+/* 红方棋子 */
+.chess-piece.red {
+  color: white;
+  background-color: rgb(200, 0, 0);
+  border: 1px solid rgb(180, 0, 0);
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5), 0 0 5px rgba(0, 0, 0, 0.3);
+  /* 添加光泽效果 */
+  background-image: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.4) 0%,
+    transparent 40%
+  );
+}
+
+/* 黑方棋子 */
+.chess-piece.black {
+  color: white;
+  background-color: rgb(0, 0, 0);
+  border: 1px solid rgb(30, 30, 30);
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.3),
+    0 0 5px rgba(255, 255, 255, 0.2);
+  /* 添加光泽效果 */
+  background-image: radial-gradient(
+    circle at 30% 30%,
+    rgba(100, 100, 100, 0.4) 0%,
+    transparent 40%
+  );
+}
+
+/* 棋子定位 */
+.rook {
+  left: calc(5.5% + (var(--col) - 1) * 11.125%);
+  top: calc(5% + (10 - var(--row)) * 10%);
+}
+
+/* 悬停效果 */
+.chess-piece:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4), inset 0 -3px 5px rgba(0, 0, 0, 0.3);
+  filter: brightness(1.05);
+}
+
+/* 棋子按钮组样式 */
+.piece-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.piece-button {
+  padding: 8px 0;
+  border: none;
+  border-radius: 4px;
+  background-color: #e8c887;
+  color: #8b4513;
+  font-size: 1.1em;
+  font-weight: bold;
+  font-family: "STKaiti", "楷体", serif;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.piece-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  background-color: #d8b877;
+}
+
+.control-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.control-button {
+    padding: 10px 0;
+    border: none;
+    border-radius: 4px;
+    background-color: #8b4513;
+    color: white;
+    font-size: 1em;
+    font-weight: bold;
+    font-family: "STKaiti", "楷体", serif;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.control-button:hover {
+    transform: scale(1.02);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    background-color: #7a3b10;
+}
+
+/* 移动端适配 */
+@media (max-width: 480px) {
+    .main-container {
+        max-width: 95vw;
+    }
+    
+    .piece-button {
+        font-size: 1em;
+        padding: 6px 0;
+    }
+    
+    .chess-board {
+        max-height: 50vh;
+    }
+
+    .control-button {
+        font-size: 0.9em;
+        padding: 8px 0;
+    }
+}
