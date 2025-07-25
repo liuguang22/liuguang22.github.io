@@ -35,7 +35,7 @@ body {
 .chess-board {
   position: relative;
   width: 100%;
-  aspect-ratio: 9/10;
+  aspect-ratio: 7/8; /* 修改宽高比为7:8 */
   max-height: 55vh; /* 限制棋盘高度 */
   background-color: #e8c887;
   border: 2px solid #8b4513;
@@ -50,7 +50,8 @@ body {
   height: 1px;
   background-color: #000;
   left: 5.5%;
-  top: calc(5% + var(--line-index) * 10%);
+  /* 修改：9条横线形成8个间隔，每个间隔11.25% */
+  top: calc(5% + var(--line-index) * 11.25%);
 }
 
 /* 竖线 */
@@ -60,7 +61,8 @@ body {
   height: 90%; /* 100% - 5%*2 */
   background-color: #000;
   top: 5%;
-  left: calc(5.5% + var(--line-index) * 11.125%);
+  /* 修改：8条竖线形成7个间隔，每个间隔12.714% */
+  left: calc(5.5% + var(--line-index) * 12.714%);
 }
 
 /* 添加楷体字体 */
@@ -86,6 +88,8 @@ body {
   font-family: "STKaiti", "楷体", serif;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), inset 0 -2px 3px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
+  left: calc(5.5% + (var(--col) - 1) * 12.714%);
+  top: calc(5% + (9 - var(--row)) * 11.25%);
 }
 /* 红方棋子 */
 .chess-piece.red {
@@ -114,12 +118,6 @@ body {
     rgba(100, 100, 100, 0.4) 0%,
     transparent 40%
   );
-}
-
-/* 棋子定位 */
-.rook {
-  left: calc(5.5% + (var(--col) - 1) * 11.125%);
-  top: calc(5% + (10 - var(--row)) * 10%);
 }
 
 /* 悬停效果 */
@@ -159,52 +157,260 @@ body {
   background-color: #d8b877;
 }
 
+.item-checkboxes {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+  background-color: #f5f5dc;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-family: "STKaiti", "楷体", serif;
+}
+
+.item-checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.95em;
+  color: #8b4513;
+}
+
 .control-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    width: 100%;
-    margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .control-button {
-    padding: 10px 0;
-    border: none;
-    border-radius: 4px;
-    background-color: #8b4513;
-    color: white;
-    font-size: 1em;
-    font-weight: bold;
-    font-family: "STKaiti", "楷体", serif;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    transition: all 0.2s ease;
-    text-align: center;
+  padding: 10px 0;
+  border: none;
+  border-radius: 4px;
+  background-color: #8b4513;
+  color: white;
+  font-size: 1em;
+  font-weight: bold;
+  font-family: "STKaiti", "楷体", serif;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  text-align: center;
 }
 
 .control-button:hover {
-    transform: scale(1.02);
-    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-    background-color: #7a3b10;
+  transform: scale(1.02);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  background-color: #7a3b10;
+}
+
+/* 危险区域样式 */
+.danger-zone {
+  position: absolute;
+  width: 9%;
+  height: 9%;
+  border-radius: 50%;
+  background-color: rgba(255, 0, 0, 0.2);
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  left: calc(5.5% + (var(--col) - 1) * 12.714%);
+  top: calc(5% + (9 - var(--row)) * 11.25%);
+}
+
+.danger-zone::before,
+.danger-zone::after {
+  content: "";
+  position: absolute;
+  width: 80%;
+  height: 2px;
+  background-color: red;
+  top: 50%;
+  left: 10%;
+}
+
+.danger-zone::before {
+  transform: rotate(45deg);
+}
+
+.danger-zone::after {
+  transform: rotate(-45deg);
 }
 
 /* 移动端适配 */
 @media (max-width: 480px) {
-    .main-container {
-        max-width: 95vw;
-    }
-    
-    .piece-button {
-        font-size: 1em;
-        padding: 6px 0;
-    }
-    
-    .chess-board {
-        max-height: 50vh;
-    }
+  .main-container {
+    max-width: 95vw;
+  }
 
-    .control-button {
-        font-size: 0.9em;
-        padding: 8px 0;
+  .piece-button {
+    font-size: 1em;
+    padding: 6px 0;
+  }
+
+  .chess-board {
+    max-height: 50vh;
+  }
+
+  .control-button {
+    font-size: 0.9em;
+    padding: 8px 0;
+  }
+}
+
+/* 拖拽时的棋子样式 */
+.chess-piece.dragging {
+  opacity: 0.7;
+  z-index: 100;
+  transition: none;
+}
+
+/* 防止文本在拖拽时被选中 */
+.chess-piece {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* 移动端触摸反馈 */
+.chess-piece:active {
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+/* 最佳位置样式 */
+.best-move {
+  position: absolute;
+  width: 9%;
+  height: 9%;
+  border-radius: 50%;
+  background-color: rgba(102, 204, 255, 0.6); /* 天依蓝 */
+  transform: translate(-50%, -50%);
+  z-index: 6; /* 在安全区域之上 */
+  left: calc(5.5% + (var(--col) - 1) * 12.714%);
+  top: calc(5% + (9 - var(--row)) * 11.25%);
+  animation: pulse 1.5s infinite;
+  border: 2px solid #3399ff;
+}
+
+/* 添加安全区域样式 */
+.safe-zone {
+  position: absolute;
+  width: 9%;
+  height: 9%;
+  border-radius: 50%;
+  background-color: rgba(0, 255, 0, 0.2);
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  left: calc(5.5% + (var(--col) - 1) * 12.714%);
+  top: calc(5% + (9 - var(--row)) * 11.25%);
+}
+
+.safe-zone::before,
+.safe-zone::after {
+  content: "";
+  position: absolute;
+  width: 60%;
+  height: 2px;
+  background-color: green;
+  top: 50%;
+  left: 20%;
+}
+
+.safe-zone::before {
+  transform: rotate(0deg);
+}
+
+.safe-zone::after {
+  transform: rotate(90deg);
+}
+
+/* 吃子位置特殊样式 */
+.safe-zone.capture-zone {
+  background-color: rgba(0, 200, 0, 0.4);
+  border: 2px solid darkgreen;
+  animation: pulse 1.5s infinite;
+}
+
+.chess-piece.capturing {
+  animation: captureAnimation 0.5s ease-out forwards;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+@keyframes captureAnimation {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+}
+
+.instructions {
+    width: 100%;
+    background-color: #f8f8f0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-family: "STKaiti", "楷体", serif;
+    color: #5a3e1f;
+    border: 1px solid #d4c9a8;
+}
+
+.instructions h3 {
+    color: #8b4513;
+    margin-bottom: 8px;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+.instructions ul {
+    padding-left: 20px;
+    margin-bottom: 10px;
+}
+
+.instructions li {
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.instructions p {
+    font-size: 0.85em;
+    text-align: center;
+    margin-top: 8px;
+    color: #7a3b10;
+}
+
+@media (max-width: 480px) {
+    .instructions {
+        padding: 8px;
+    }
+    
+    .instructions li {
+        font-size: 0.8em;
+    }
+    
+    .instructions p {
+        font-size: 0.75em;
     }
 }
