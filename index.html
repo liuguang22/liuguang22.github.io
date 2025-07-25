@@ -1,92 +1,59 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>车棋游戏</title>
-    <link rel="stylesheet" href="styles.css">
-
-    <!-- 引入 Element Plus 和 Vue3 CDN -->
-    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <script src="https://unpkg.com/element-plus/dist/index.full.js"></script>
+    <title>中国象棋棋盘</title>
+    <link rel="stylesheet" href="index.css">
 </head>
+
 <body>
-    <h1>车棋游戏</h1>
-    <p>规则: 您操控一个车(红色)，对方有多种象棋棋子。车可以横竖直线移动，需要避开对方棋子的攻击范围。每回合击杀一个棋子，游戏继续。特殊规则：车吃掉将后，下一步会消除该点所在行列的所有棋子。</p>
+    <div class="main-container">
+        <div class="chess-container">
+            <div class="chess-board">
+                <!-- 10条横线 -->
+                <div class="horizontal-line" style="--line-index: 0;"></div>
+                <div class="horizontal-line" style="--line-index: 1;"></div>
+                <div class="horizontal-line" style="--line-index: 2;"></div>
+                <div class="horizontal-line" style="--line-index: 3;"></div>
+                <div class="horizontal-line" style="--line-index: 4;"></div>
+                <div class="horizontal-line" style="--line-index: 5;"></div>
+                <div class="horizontal-line" style="--line-index: 6;"></div>
+                <div class="horizontal-line" style="--line-index: 7;"></div>
+                <div class="horizontal-line" style="--line-index: 8;"></div>
+                <div class="horizontal-line" style="--line-index: 9;"></div>
 
-    <div class="game-status" id="gameStatus">游戏状态：拖拽棋子可以移动它们。移动后系统会自动计算车的最佳移动位置。</div>
+                <!-- 9条竖线 -->
+                <div class="vertical-line" style="--line-index: 0;"></div>
+                <div class="vertical-line" style="--line-index: 1;"></div>
+                <div class="vertical-line" style="--line-index: 2;"></div>
+                <div class="vertical-line" style="--line-index: 3;"></div>
+                <div class="vertical-line" style="--line-index: 4;"></div>
+                <div class="vertical-line" style="--line-index: 5;"></div>
+                <div class="vertical-line" style="--line-index: 6;"></div>
+                <div class="vertical-line" style="--line-index: 7;"></div>
+                <div class="vertical-line" style="--line-index: 8;"></div>
 
-    <div class="board" id="board"></div>
-
-    <div class="mobile-controls" id="mobileControls">
-        <p class="mobile-info">提示：在移动设备上，先点击棋子选中，再点击目标位置移动</p>
-    </div>
-
-    <div class="result-area" id="resultArea">
-        <h3>车的最佳移动</h3>
-        <p>当前无建议。请添加棋子后计算。</p>
-    </div>
-
-    <div class="button-group">
-        <button class="btn" id="calculateMove">计算最佳移动</button>
-        <button class="btn" id="resetBoard">重置棋盘</button>
-    </div>
-
-    <!-- 抽屉区域 -->
-    <div id="pieceDrawerApp">
-      <el-button class="btn" type="primary" @click="drawerVisible = true">添加棋子</el-button>
-
-      <el-drawer
-        v-model="drawerVisible"
-        title="从下方拖动棋子到棋盘"
-        direction="btt"
-        size="auto"
-        :with-header="true"
-        append-to-body
-      >
-        <div class="piece-selection">
-          <div
-            class="selectable-piece piece"
-            v-for="piece in pieces"
-            :class="piece.type"
-            :key="piece.type"
-            :data-type="piece.type"
-            draggable="true"
-            @dragstart="handleDragStart"
-          >
-            {{ piece.label }}
-          </div>
+                <!-- 棋子 - 车 -->
+                <div class="chess-piece red rook" style="--col: 5; --row: 3;">车</div>
+            </div>
         </div>
-      </el-drawer>
+
+        <div class="piece-buttons">
+            <button class="piece-button">添加卒</button>
+            <button class="piece-button">添加士</button>
+            <button class="piece-button">添加象</button>
+            <button class="piece-button">添加马</button>
+            <button class="piece-button">添加车</button>
+            <button class="piece-button">添加将</button>
+        </div>
+
+        <div class="control-buttons">
+            <button class="control-button">计算最佳位置</button>
+            <button class="control-button">重置棋盘</button>
+        </div>
     </div>
-
-    <script src="index.js"></script>
-
-    <script>
-    const { createApp, ref } = Vue;
-
-    createApp({
-      setup() {
-        const drawerVisible = ref(false);
-        const pieces = ref([
-          { type: 'car', label: '车' },
-          { type: 'knight', label: '马' },
-          { type: 'cannon', label: '炮' },
-          { type: 'bishop', label: '象' },
-          { type: 'advisor', label: '士' },
-          { type: 'pawn', label: '兵' },
-          { type: 'king', label: '将' }
-        ]);
-
-        function handleDragStart(e) {
-          const type = e.target.dataset.type;
-          e.dataTransfer.setData('pieceType', type);
-        }
-
-        return { drawerVisible, pieces, handleDragStart };
-      }
-    }).use(ElementPlus).mount('#pieceDrawerApp');
-    </script>
 </body>
+
 </html>
