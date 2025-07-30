@@ -187,6 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (isPositionOccupied(col, row, draggedPiece)) {
       const otherPiece = getPieceAtPosition(col, row);
+      console.log(draggedPiece, otherPiece);
       if (canCapture(draggedPiece, otherPiece)) {
         capturePiece(otherPiece);
         // 移动红车到目标位置
@@ -210,6 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function getPieceAtPosition(col, row) {
     const pieces = document.querySelectorAll(".chess-piece");
     for (const piece of pieces) {
+      if (piece === draggedPiece) continue;
       const pieceCol = parseInt(piece.style.getPropertyValue("--col"));
       const pieceRow = parseInt(piece.style.getPropertyValue("--row"));
       if (pieceCol === col && pieceRow === row) return piece;
@@ -253,6 +255,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 应用道具效果
   function applyItemEffects(col, row) {
+    if (!draggedPiece || !draggedPiece.classList.contains("red")) return;
     if (killGeneralEnabled) removeEnemiesOnCross(col, row);
     if (useItemEnabled)
       removeEnemiesOnPath(originalPosition.col, originalPosition.row, col, row);
