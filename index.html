@@ -19,7 +19,6 @@
                 <li><strong>吃子规则</strong>：将红车移动到黑色棋子上</li>
                 <li><strong>杀死老将</strong>：启用后消灭十字线上的敌人</li>
                 <li><strong>使用道具</strong>：启用后消灭直线路径上的敌人</li>
-                <li><strong>计算最佳位置</strong>：分析红车最佳移动位置</li>
             </ul>
             <p><strong>提示</strong>：红色叉叉表示危险区域，绿色加号表示安全区域</p>
         </div>
@@ -52,6 +51,15 @@
             </div>
         </div>
 
+        <div class="item-checkboxes">
+            <label>
+                <input type="checkbox" id="killGeneral"> 杀死老将
+            </label>
+            <label>
+                <input type="checkbox" id="useItem"> 使用道具
+            </label>
+        </div>
+
         <div class="piece-buttons">
             <button class="piece-button">添加卒</button>
             <button class="piece-button">添加士</button>
@@ -62,18 +70,7 @@
             <button class="piece-button">添加将</button>
         </div>
 
-        <!-- 新增道具勾选框 -->
-        <div class="item-checkboxes">
-            <label>
-                <input type="checkbox" id="killGeneral"> 杀死老将
-            </label>
-            <label>
-                <input type="checkbox" id="useItem"> 使用道具
-            </label>
-        </div>
-
         <div class="control-buttons">
-            <button class="control-button">计算最佳位置</button>
             <button class="control-button">重置棋盘</button>
         </div>
     </div>
