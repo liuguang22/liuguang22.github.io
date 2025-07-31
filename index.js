@@ -380,25 +380,43 @@ document.addEventListener("DOMContentLoaded", function () {
         break;
 
       case "horse":
-        positions.push(
-          { col: col + 1, row: row + 2 },
-          { col: col - 1, row: row + 2 },
-          { col: col + 1, row: row - 2 },
-          { col: col - 1, row: row - 2 },
-          { col: col + 2, row: row + 1 },
-          { col: col - 2, row: row + 1 },
-          { col: col + 2, row: row - 1 },
-          { col: col - 2, row: row - 1 }
-        );
+        if (!isPositionOccupied(col, row + 1)) {
+          positions.push({ col: col + 1, row: row + 2 });
+          positions.push({ col: col - 1, row: row + 2 });
+        }
+        // 下方向
+        if (!isPositionOccupied(col, row - 1)) {
+          positions.push({ col: col + 1, row: row - 2 });
+          positions.push({ col: col - 1, row: row - 2 });
+        }
+        // 左方向
+        if (!isPositionOccupied(col - 1, row)) {
+          positions.push({ col: col - 2, row: row + 1 });
+          positions.push({ col: col - 2, row: row - 1 });
+        }
+        // 右方向
+        if (!isPositionOccupied(col + 1, row)) {
+          positions.push({ col: col + 2, row: row + 1 });
+          positions.push({ col: col + 2, row: row - 1 });
+        }
         break;
 
       case "elephant":
-        positions.push(
-          { col: col + 2, row: row + 2 },
-          { col: col - 2, row: row + 2 },
-          { col: col + 2, row: row - 2 },
-          { col: col - 2, row: row - 2 }
-        );
+        if (!isPositionOccupied(col - 1, row + 1)) {
+          positions.push({ col: col - 2, row: row + 2 });
+        }
+        // 右上方向
+        if (!isPositionOccupied(col + 1, row + 1)) {
+          positions.push({ col: col + 2, row: row + 2 });
+        }
+        // 左下方向
+        if (!isPositionOccupied(col - 1, row - 1)) {
+          positions.push({ col: col - 2, row: row - 2 });
+        }
+        // 右下方向
+        if (!isPositionOccupied(col + 1, row - 1)) {
+          positions.push({ col: col + 2, row: row - 2 });
+        }
         break;
 
       case "advisor":
