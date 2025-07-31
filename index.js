@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const chessBoard = document.querySelector(".chess-board");
   const pieceButtons = document.querySelectorAll(".piece-button");
   const resetButton = document.querySelector(".control-button:last-child");
-  const calculateButton = document.querySelector(".control-button:first-child");
   const killGeneralCheckbox = document.getElementById("killGeneral");
   const useItemCheckbox = document.getElementById("useItem");
 
@@ -53,18 +52,17 @@ document.addEventListener("DOMContentLoaded", function () {
     // 重置按钮点击事件
     resetButton.addEventListener("click", resetBoard);
 
-    // 计算最佳位置按钮点击事件
-    calculateButton.addEventListener("click", calculateBestMove);
-
     // 道具勾选框事件
     killGeneralCheckbox.addEventListener("change", () => {
       killGeneralEnabled = killGeneralCheckbox.checked;
       updateDangerZones();
+      calculateBestMove();
     });
 
     useItemCheckbox.addEventListener("change", () => {
       useItemEnabled = useItemCheckbox.checked;
       updateDangerZones();
+      calculateBestMove();
     });
   }
 
@@ -89,6 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
     chessBoard.appendChild(piece);
     setupDragEvents(piece);
     updateDangerZones();
+    calculateBestMove();
   }
 
   // 查找空位置
@@ -205,6 +204,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     cleanupAfterDrag();
     updateDangerZones();
+    calculateBestMove();
   }
 
   // 获取指定位置的棋子
@@ -516,25 +516,91 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const safeMoves = calculateSafeMoves();
-    if (safeMoves.length === 0) {
-      alert(
-        `红车当前位置：(${rookPos.col}, ${rookPos.row})，没有安全移动位置！`
+    if (safeMoves.length === 0) return;
+
+    const kingCaptureMove = safeMoves.find((move) => {
+      const piece = getPieceAtPosition(move.col, move.row);
+      return piece && piece.classList.contains("general");
+    });
+
+    const bestMove = kingCaptureMove || safeMoves[0];
+
+    if (kingCaptureMove) {
+      const followUpMove = findBestPositionAfterEatingKing(
+        rookPos.col,
+        rookPos.row,
+        kingCaptureMove.col,
+        kingCaptureMove.row
       );
-      return;
+
+      if (followUpMove) {
+        bestMove.score += followUpMove.score * 0.7;
+      }
     }
-
-    const bestMove = safeMoves[0];
-    let message = `红车当前位置：(${rookPos.col}, ${rookPos.row})\n`;
-    message += `最佳移动位置：(${bestMove.col}, ${bestMove.row})`;
-    if (bestMove.isCapture) message += "\n可以吃掉黑方棋子！";
-
-    alert(message);
 
     const bestMoveElement = document.createElement("div");
     bestMoveElement.className = "best-move";
     bestMoveElement.style.setProperty("--col", bestMove.col);
     bestMoveElement.style.setProperty("--row", bestMove.row);
     chessBoard.appendChild(bestMoveElement);
+
+    console.log(bestMove);
+  }
+
+  function findBestPositionAfterEatingKing(
+    startCol,
+    startRow,
+    kingCol,
+    kingRow
+  ) {
+    // 模拟吃掉将后的棋盘状态
+    const simulatedPieces = [];
+    document.querySelectorAll(".chess-piece").forEach((piece) => {
+      const col = parseInt(piece.style.getPropertyValue("--col"));
+      const row = parseInt(piece.style.getPropertyValue("--row"));
+      if (!(col === kingCol && row === kingRow)) {
+        simulatedPieces.push({
+          element: piece,
+          col,
+          row,
+          type: piece.className.split(" ")[2],
+          color: piece.classList.contains("red") ? "red" : "black",
+        });
+      }
+    });
+
+    let bestPosition = null;
+    let maxScore = 0;
+
+    // 检查所有可能移动
+    const directions = [
+      { dx: 0, dy: 1 },
+      { dx: 0, dy: -1 },
+      { dx: -1, dy: 0 },
+      { dx: 1, dy: 0 },
+    ];
+    directions.forEach((dir) => {
+      for (let i = 1; i <= 8; i++) {
+        const newCol = kingCol + dir.dx * i;
+        const newRow = kingRow + dir.dy * i;
+
+        if (newCol < 1 || newCol > 8 || newRow < 1 || newRow > 9) break;
+
+        // 计算该位置能消除的棋子数量
+        const piecesToRemove = simulatedPieces.filter(
+          (p) => p.color === "black" && (p.col === newCol || p.row === newRow)
+        );
+
+        const score = piecesToRemove.length * 20; // 每个棋子20分
+
+        if (score > maxScore) {
+          maxScore = score;
+          bestPosition = { col: newCol, row: newRow, score };
+        }
+      }
+    });
+
+    return bestPosition;
   }
 
   // 获取红车位置
@@ -621,47 +687,65 @@ document.addEventListener("DOMContentLoaded", function () {
     const centerX = 5,
       centerY = 5;
     const distanceToCenter = Math.abs(col - centerX) + Math.abs(row - centerY);
-    score += (10 - distanceToCenter) * 2;
+    score += (10 - distanceToCenter) * 2 * 0.8;
 
-    // 2. 靠近黑方棋子加分
-    document.querySelectorAll(".chess-piece.black").forEach((piece) => {
-      const pieceCol = parseInt(piece.style.getPropertyValue("--col"));
-      const pieceRow = parseInt(piece.style.getPropertyValue("--row"));
-      const pieceType = piece.className.split(" ")[2];
+    const threatScore = calculateThreatPotential(col, row);
+    score += threatScore * 15;
 
-      // 吃子加分
-      if (col === pieceCol && row === pieceRow) {
-        score += getCaptureScore(pieceType);
+    if (isCapture) {
+      const targetPiece = getPieceAtPosition(col, row);
+      if (targetPiece) {
+        const pieceType = targetPiece.className.split(" ")[2];
+        score +=
+          getCaptureScore(pieceType) * (pieceType === "general" ? 10 : 1);
       }
+    }
 
-      // 靠近棋子加分
-      const distance = Math.abs(col - pieceCol) + Math.abs(row - pieceRow);
-      score += (5 - Math.min(distance, 5)) * 2;
-    });
-
-    // 3. 道具带来的额外吃子机会加分
     piecesToRemove.forEach((piece) => {
-      if (piece.classList.contains("black")) {
-        score += getCaptureScore(piece.className.split(" ")[2]);
-      }
+      const pieceType = piece.className.split(" ")[2];
+      score += getCaptureScore(pieceType) * 0.7;
     });
 
     // 4. 安全位置额外加分
-    if (
-      isCapture ||
-      piecesToRemove.length > 0 ||
-      !isPositionAttacked(col, row)
-    ) {
+    if (!isPositionAttacked(col, row)) {
       score += 20;
     }
 
     return score;
   }
 
+  function calculateThreatPotential(col, row) {
+    let threatCount = 0;
+    const directions = [
+      { dx: 0, dy: 1 }, // 上
+      { dx: 0, dy: -1 }, // 下
+      { dx: -1, dy: 0 }, // 左
+      { dx: 1, dy: 0 }, // 右
+    ];
+
+    directions.forEach((dir) => {
+      for (let i = 1; i <= 8; i++) {
+        const checkCol = col + dir.dx * i;
+        const checkRow = row + dir.dy * i;
+
+        if (checkCol < 1 || checkCol > 8 || checkRow < 1 || checkRow > 9) break;
+
+        const piece = getPieceAtPosition(checkCol, checkRow);
+
+        if (piece && piece.classList.contains("black")) {
+          threatCount++;
+          break;
+        }
+      }
+    });
+
+    return threatCount;
+  }
+
   // 获取吃子分数
   function getCaptureScore(pieceType) {
     const scores = {
-      general: 100,
+      general: 1000,
       rook: 70,
       cannon: 60,
       horse: 50,
