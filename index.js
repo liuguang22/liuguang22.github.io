@@ -429,24 +429,81 @@ document.addEventListener("DOMContentLoaded", function () {
         break;
 
       case "rook":
-        for (let i = 1; i <= 8; i++)
-          if (i !== col) positions.push({ col: i, row });
-        for (let j = 1; j <= 9; j++)
-          if (j !== row) positions.push({ col, row: j });
+        // 水平向右
+        for (let i = col + 1; i <= 8; i++) {
+          positions.push({ col: i, row });
+          if (isPositionOccupied(i, row)) break; // 遇到棋子就停止
+        }
+
+        // 水平向左
+        for (let i = col - 1; i >= 1; i--) {
+          positions.push({ col: i, row });
+          if (isPositionOccupied(i, row)) break; // 遇到棋子就停止
+        }
+
+        // 垂直向上
+        for (let j = row + 1; j <= 9; j++) {
+          positions.push({ col, row: j });
+          if (isPositionOccupied(col, j)) break; // 遇到棋子就停止
+        }
+
+        // 垂直向下
+        for (let j = row - 1; j >= 1; j--) {
+          positions.push({ col, row: j });
+          if (isPositionOccupied(col, j)) break; // 遇到棋子就停止
+        }
         break;
 
       case "cannon":
-        // 水平方向
-        for (let i = 1; i <= 8; i++) {
-          if (i !== col && hasScreenBetween(col, row, i, row)) {
-            positions.push({ col: i, row });
+        // 向右
+        {
+          let screenFound = false;
+          for (let i = col + 1; i <= 8; i++) {
+            if (!screenFound) {
+              if (isPositionOccupied(i, row)) screenFound = true; // 找到第一个棋子（炮架）
+            } else {
+              if (isPositionOccupied(i, row)) break; // 遇到第二个棋子 → 停止
+              positions.push({ col: i, row }); // 炮架后的空格 → 危险区域
+            }
           }
         }
 
-        // 垂直方向
-        for (let j = 1; j <= 9; j++) {
-          if (j !== row && hasScreenBetween(col, row, col, j)) {
-            positions.push({ col, row: j });
+        // 向左
+        {
+          let screenFound = false;
+          for (let i = col - 1; i >= 1; i--) {
+            if (!screenFound) {
+              if (isPositionOccupied(i, row)) screenFound = true;
+            } else {
+              if (isPositionOccupied(i, row)) break;
+              positions.push({ col: i, row });
+            }
+          }
+        }
+
+        // 向上
+        {
+          let screenFound = false;
+          for (let j = row + 1; j <= 9; j++) {
+            if (!screenFound) {
+              if (isPositionOccupied(col, j)) screenFound = true;
+            } else {
+              if (isPositionOccupied(col, j)) break;
+              positions.push({ col, row: j });
+            }
+          }
+        }
+
+        // 向下
+        {
+          let screenFound = false;
+          for (let j = row - 1; j >= 1; j--) {
+            if (!screenFound) {
+              if (isPositionOccupied(col, j)) screenFound = true;
+            } else {
+              if (isPositionOccupied(col, j)) break;
+              positions.push({ col, row: j });
+            }
           }
         }
         break;
@@ -464,24 +521,6 @@ document.addEventListener("DOMContentLoaded", function () {
     return positions.filter(
       (pos) => pos.col >= 1 && pos.col <= 8 && pos.row >= 1 && pos.row <= 9
     );
-  }
-
-  // 检查两点之间是否有跳板
-  function hasScreenBetween(col1, row1, col2, row2) {
-    if (col1 === col2) {
-      const minRow = Math.min(row1, row2);
-      const maxRow = Math.max(row1, row2);
-      for (let r = minRow + 1; r < maxRow; r++) {
-        if (isPositionOccupied(col1, r)) return true;
-      }
-    } else if (row1 === row2) {
-      const minCol = Math.min(col1, col2);
-      const maxCol = Math.max(col1, col2);
-      for (let c = minCol + 1; c < maxCol; c++) {
-        if (isPositionOccupied(c, row1)) return true;
-      }
-    }
-    return false;
   }
 
   // 创建危险区域
